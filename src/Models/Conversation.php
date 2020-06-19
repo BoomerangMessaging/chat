@@ -21,7 +21,7 @@ use Musonza\Chat\Exceptions\InvalidDirectMessageNumberOfParticipants;
 class Conversation extends BaseModel
 {
     protected $table = ConfigurationManager::CONVERSATIONS_TABLE;
-    protected $fillable = ['data', 'direct_message'];
+    protected $fillable = ['client_id', 'trans_id', 'data', 'direct_message'];
     protected $casts = [
         'data'           => 'array',
         'direct_message' => 'boolean',
@@ -167,7 +167,7 @@ class Conversation extends BaseModel
         }
 
         /** @var Conversation $conversation */
-        $conversation = $this->create(['data' => $payload['data'], 'direct_message' => (bool) $payload['direct_message']]);
+        $conversation = $this->create(['client_id' => $payload['client_id'], 'trans_id' => $payload['trans_id'], 'data' => $payload['data'], 'direct_message' => (bool) $payload['direct_message']]);
 
         if ($payload['participants']) {
             $conversation->addParticipants($payload['participants']);
@@ -370,6 +370,10 @@ class Conversation extends BaseModel
 
         if (isset($options['filters']['direct_message'])) {
             $paginator = $paginator->where('c.direct_message', (bool) $options['filters']['direct_message']);
+        }
+
+        if (isset($options['filters']['client_id'])) {
+            $paginator = $paginator->where('c.client_id', (int) $options['filters']['client_id']);
         }
 
         return $paginator

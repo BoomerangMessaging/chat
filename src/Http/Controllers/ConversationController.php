@@ -55,7 +55,7 @@ class ConversationController extends Controller
     public function store(StoreConversation $request)
     {
         $participants = $request->participants();
-        $conversation = Chat::createConversation($participants, $request->input('data', []));
+        $conversation = Chat::createConversation($participants, $request->input('data', []), $request->input('client_id', null), $request->input('trans_id', null));
 
         return $this->itemResponse($conversation);
     }

@@ -50,6 +50,26 @@ class ConversationService
     }
 
     /**
+     * Get By transId
+     * 
+     * @param int $id
+     */
+    public function getByTransId($id)
+    {
+        return $this->conversation->where('trans_id', $id)->firstOrFail();
+    }
+
+    /**
+     * Get By ClientId
+     * 
+     * @param int $id
+     */
+    public function getByClientId($id)
+    {
+        return $this->conversation->where('client_id', $id)->firstOrFail();
+    }
+
+    /**
      * Get messages in a conversation.
      */
     public function getMessages()
@@ -170,6 +190,20 @@ class ConversationService
     public function isPrivate($isPrivate = true)
     {
         $this->filters['private'] = $isPrivate;
+
+        return $this;
+    }
+
+    /**
+     * Sets the conversation client id to query for, conversations.
+     *
+     * @param int clientId
+     *
+     * @return $this
+     */
+    public function setClientId(int $clientId)
+    {
+        $this->filters['client_id'] = $clientId;
 
         return $this;
     }
