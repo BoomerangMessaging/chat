@@ -10,6 +10,7 @@ class SendMessageCommand
     public $body;
     public $conversation;
     public $type;
+    public $data;
     public $participant;
 
     /**
@@ -17,12 +18,14 @@ class SendMessageCommand
      * @param string       $body         The message body
      * @param Model        $sender       The sender identifier
      * @param string       $type         The message type
+     * @param array        $data         The message meta data
      */
-    public function __construct(Conversation $conversation, $body, Model $sender, $type = 'text')
+    public function __construct(Conversation $conversation, $body, Model $sender, $type = 'text', $data = [])
     {
         $this->conversation = $conversation;
         $this->body = $body;
         $this->type = $type;
+        $this->data = $data;
         $this->participant = $this->conversation->participantFromSender($sender);
     }
 }

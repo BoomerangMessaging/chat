@@ -180,7 +180,8 @@ The default message type is `text`. If you want to specify custom type you can c
 
 ```php
 $message = Chat::message('http://example.com/img')
-		->type('image')
+        ->type('image')
+        ->data(['usefularray' => 'data'])
 		->from($model)
 		->to($conversation)
 		->send();

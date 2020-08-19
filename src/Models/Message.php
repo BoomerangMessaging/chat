@@ -18,6 +18,7 @@ class Message extends BaseModel
         'body',
         'participation_id',
         'type',
+        'data',
     ];
 
     protected $table = ConfigurationManager::MESSAGES_TABLE;
@@ -34,7 +35,8 @@ class Message extends BaseModel
      * @var array
      */
     protected $casts = [
-        'flagged' => 'boolean',
+        'flagged'   => 'boolean',
+        'data'      => 'array'
     ];
 
     protected $appends = ['sender'];
@@ -77,15 +79,17 @@ class Message extends BaseModel
      * @param string        $body
      * @param Participation $participant
      * @param string        $type
+     * @param array         $data
      *
      * @return Model
      */
-    public function send(Conversation $conversation, string $body, Participation $participant, string $type = 'text'): Model
+    public function send(Conversation $conversation, string $body, Participation $participant, string $type = 'text', array $data = []): Model
     {
         $message = $conversation->messages()->create([
             'body'             => $body,
             'participation_id' => $participant->getKey(),
             'type'             => $type,
+            'data'             => $data,
         ]);
 
         if (Chat::broadcasts()) {
