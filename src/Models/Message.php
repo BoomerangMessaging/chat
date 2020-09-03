@@ -3,6 +3,7 @@
 namespace Musonza\Chat\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Musonza\Chat\BaseModel;
 use Musonza\Chat\Chat;
 use Musonza\Chat\ConfigurationManager;
@@ -13,7 +14,7 @@ use Musonza\Chat\Eventing\MessageWasSent;
 class Message extends BaseModel
 {
     use EventGenerator;
-
+    use SoftDeletes;
     protected $fillable = [
         'body',
         'participation_id',

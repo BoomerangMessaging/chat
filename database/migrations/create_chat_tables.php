@@ -15,20 +15,28 @@ class CreateChatTables extends Migration
     public function up()
     {
         Schema::create(ConfigurationManager::CONVERSATIONS_TABLE, function (Blueprint $table) {
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
             $table->bigIncrements('id');
+			$table->integer('client_id');
+			$table->bigInteger('trans_id');
             $table->boolean('private')->default(true);
             $table->boolean('direct_message')->default(false);
             $table->text('data')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create(ConfigurationManager::PARTICIPATION_TABLE, function (Blueprint $table) {
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
             $table->bigIncrements('id');
             $table->bigInteger('conversation_id')->unsigned();
             $table->bigInteger('messageable_id')->unsigned();
             $table->string('messageable_type');
             $table->text('settings')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(['conversation_id', 'messageable_id', 'messageable_type'], 'participation_index');
 
@@ -39,12 +47,16 @@ class CreateChatTables extends Migration
         });
 
         Schema::create(ConfigurationManager::MESSAGES_TABLE, function (Blueprint $table) {
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
             $table->bigIncrements('id');
             $table->text('body');
             $table->bigInteger('conversation_id')->unsigned();
             $table->bigInteger('participation_id')->unsigned()->nullable();
             $table->string('type')->default('text');
+            $table->text('data')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('participation_id')
                 ->references('id')
@@ -58,6 +70,8 @@ class CreateChatTables extends Migration
         });
 
         Schema::create(ConfigurationManager::MESSAGE_NOTIFICATIONS_TABLE, function (Blueprint $table) {
+            $table->charset = 'utf8';
+            $table->collation = 'utf8_unicode_ci';
             $table->bigIncrements('id');
             $table->bigInteger('message_id')->unsigned();
             $table->bigInteger('messageable_id')->unsigned();
@@ -96,9 +110,11 @@ class CreateChatTables extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists(ConfigurationManager::MESSAGE_NOTIFICATIONS_TABLE);
-        Schema::dropIfExists(ConfigurationManager::MESSAGES_TABLE);
-        Schema::dropIfExists(ConfigurationManager::PARTICIPATION_TABLE);
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists(ConfigurationManager::CONVERSATIONS_TABLE);
+        Schema::dropIfExists(ConfigurationManager::PARTICIPATION_TABLE);
+        Schema::dropIfExists(ConfigurationManager::MESSAGES_TABLE);
+        Schema::dropIfExists(ConfigurationManager::MESSAGE_NOTIFICATIONS_TABLE);
+        Schema::enableForeignKeyConstraints();
     }
 }
