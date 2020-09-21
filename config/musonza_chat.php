@@ -8,6 +8,7 @@ return [
      * Event: Musonza\Chat\Eventing\MessageWasSent
      */
     'broadcasts' => false,
+    'events'     => false,
 
     /*
      * Specify the fields that you want to return each time for the sender.

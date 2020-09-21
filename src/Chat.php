@@ -133,6 +133,16 @@ class Chat
         return config('musonza_chat.broadcasts');
     }
 
+    /**
+     * Should the messages be trigger events.
+     *
+     * @return bool
+     */
+    public static function events()
+    {
+        return config('musonza_chat.events') ?? false;
+    }
+
     public static function sentMessageEvent()
     {
         return config('musonza_chat.sent_message_event');
