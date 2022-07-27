@@ -57,7 +57,9 @@ class Message extends BaseModel
 
         $fields = Chat::senderFieldsWhitelist();
 
-        return $fields ? $this->participation->messageable->only($fields) : $this->participation->messageable;
+        $s = $fields ? $this->participation->messageable->only($fields) : $this->participation->messageable;
+        unset($this->participation->messageable);
+        return $s;
     }
 
     public function unreadCount(Model $participant)
