@@ -40,7 +40,7 @@ class Message extends BaseModel
         'data'      => 'array'
     ];
 
-    protected $appends = ['sender'];
+    //protected $appends = ['sender'];
 
     public function participation()
     {
