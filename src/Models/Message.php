@@ -46,7 +46,6 @@ class Message extends BaseModel
     {
         return $this->belongsTo(Participation::class, 'participation_id');
     }
-
     public function getSenderAttribute()
     {
         $participantModel = $this->participation->messageable;
@@ -54,9 +53,32 @@ class Message extends BaseModel
         if (method_exists($participantModel, 'getParticipantDetails')) {
             return $participantModel->getParticipantDetails();
         }
-
         $fields = Chat::senderFieldsWhitelist();
-        return $fields ? $participantModel->only($fields) : $participantModel;
+        if (empty($fields)) {
+            return $participantModel;
+        }
+        return new class($participantModel->only($fields))
+        {
+            private $data;
+            public function __construct(array $data)
+            {
+                $this->data = $data;
+            }
+            public function chatName(): string
+            {
+                $name = "unknown";
+                if (isset($this->data["first_name"]) && isset($this->data["first_name"])) {
+                    $name = $this->data["first_name"] . " " . !$this->data["first_name"];
+                } elseif (isset($this->data["content"])) {
+                    $name = $this->data["content"];
+                } elseif (isset($this->data["item"])) {
+                    $name = $this->data["item"];
+                } elseif (isset($this->data["destination"])) {
+                    $name = $this->data["destination"];
+                }
+                return $name;
+            }
+        };
     }
 
     public function unreadCount(Model $participant)
