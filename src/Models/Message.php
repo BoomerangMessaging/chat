@@ -59,24 +59,22 @@ class Message extends BaseModel
         }
         return new class($participantModel->only($fields))
         {
-            private $data;
+            public string $name = "unknown";
             public function __construct(array $data)
             {
-                $this->data = $data;
+                if (isset($data["username"]) ) {
+                    $this->name = $data["username"];
+                } elseif (isset($data["content"])) {
+                    $this->name = $data["content"];
+                } elseif (isset($data["item"])) {
+                    $this->name = $data["item"];
+                } elseif (isset($data["destination"])) {
+                    $this->name = $data["destination"];
+                }
             }
             public function chatName(): string
             {
-                $name = "unknown";
-                if (isset($this->data["first_name"]) && isset($this->data["first_name"])) {
-                    $name = $this->data["first_name"] . " " . !$this->data["first_name"];
-                } elseif (isset($this->data["content"])) {
-                    $name = $this->data["content"];
-                } elseif (isset($this->data["item"])) {
-                    $name = $this->data["item"];
-                } elseif (isset($this->data["destination"])) {
-                    $name = $this->data["destination"];
-                }
-                return $name;
+                return $this->name;
             }
         };
     }
