@@ -54,10 +54,14 @@ class Message extends BaseModel
             return $participantModel->getParticipantDetails();
         }
         $fields = Chat::senderFieldsWhitelist();
-        if (empty($fields)) {
+        if ($participantModel !== null && empty($fields)) {
             return $participantModel;
         }
-        return new class($participantModel->only($fields))
+        $data = ["username" => "Recipient unknown"];
+        if($participantModel !== null){
+            $data = $participantModel->only($fields);
+        }
+        return new class($data)
         {
             public string $name = "unknown";
             public function __construct(array $data)
