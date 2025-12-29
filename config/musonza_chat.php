@@ -8,7 +8,6 @@ return [
      * Event: Musonza\Chat\Eventing\MessageWasSent
      */
     'broadcasts' => false,
-    'events'     => false,
 
     /*
      * Specify the fields that you want to return each time for the sender.
@@ -26,8 +25,9 @@ return [
 
     /*
      * Whether to load the package routes file in your application.
+     * NOTE: Changed to false by default in upstream v6.5.0
      */
-    'should_load_routes' => true,
+    'should_load_routes' => false,
 
     /*
      * Routes configuration
@@ -56,4 +56,10 @@ return [
         'message'      => null,
         'participant'  => null,
     ],
+
+    /*
+     * Controls the batch size for notification inserts to improve
+     * performance when handling large conversations.
+     */
+    'batch_insert_size' => env('MUSONZA_CHAT_BATCH_INSERT_SIZE', 1000),
 ];

@@ -3,7 +3,6 @@
 namespace Musonza\Chat\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Musonza\Chat\BaseModel;
 use Musonza\Chat\Chat;
 use Musonza\Chat\ConfigurationManager;
@@ -14,7 +13,7 @@ use Musonza\Chat\Eventing\MessageWasSent;
 class Message extends BaseModel
 {
     use EventGenerator;
-    use SoftDeletes;
+
     protected $fillable = [
         'body',
         'participation_id',
@@ -23,6 +22,7 @@ class Message extends BaseModel
     ];
 
     protected $table = ConfigurationManager::MESSAGES_TABLE;
+    
     /**
      * All of the relationships to be touched.
      *
@@ -36,8 +36,8 @@ class Message extends BaseModel
      * @var array
      */
     protected $casts = [
-        'flagged'   => 'boolean',
-        'data'      => 'array'
+        'flagged' => 'boolean',
+        'data'    => 'array',
     ];
 
     protected $appends = ['sender'];
@@ -50,6 +50,10 @@ class Message extends BaseModel
     public function getSenderAttribute()
     {
         $participantModel = $this->participation->messageable;
+
+        if (!isset($participantModel)) {
+            return null;
+        }
 
         if (method_exists($participantModel, 'getParticipantDetails')) {
             return $participantModel->getParticipantDetails();
@@ -95,8 +99,6 @@ class Message extends BaseModel
 
         if (Chat::broadcasts()) {
             broadcast(new MessageWasSent($message))->toOthers();
-        } elseif (Chat::events()) {
-            event(new MessageWasSent($message));
         }
 
         $this->createNotifications($message);
