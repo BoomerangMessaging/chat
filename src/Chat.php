@@ -44,13 +44,14 @@ class Chat
      *
      * @param array $participants
      * @param array $data
-     * @param int $clientId
-     * @param int $transId
+     * @param int $clientId Fork-specific: Links conversation to a client record
+     * @param int $transId Fork-specific: Links conversation to a transaction record
      *
      * @return Conversation
      */
     public function createConversation(array $participants, array $data = [], int $clientId = null, int $transId = null)
     {
+        // Fork-specific: client_id and trans_id for linking to external records
         $payload = [
             'participants'   => $participants,
             'data'           => $data,
@@ -131,16 +132,6 @@ class Chat
     public static function broadcasts()
     {
         return config('musonza_chat.broadcasts');
-    }
-
-    /**
-     * Should the messages be trigger events.
-     *
-     * @return bool
-     */
-    public static function events()
-    {
-        return config('musonza_chat.events') ?? false;
     }
 
     public static function sentMessageEvent()

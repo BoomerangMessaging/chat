@@ -7,7 +7,6 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Musonza\Chat\BaseModel;
@@ -21,9 +20,11 @@ use Musonza\Chat\Exceptions\InvalidDirectMessageNumberOfParticipants;
 
 class Conversation extends BaseModel
 {
-    use SoftDeletes;
     protected $table = ConfigurationManager::CONVERSATIONS_TABLE;
+    
+    // Fork-specific: client_id and trans_id allow linking conversations to external records
     protected $fillable = ['client_id', 'trans_id', 'data', 'direct_message'];
+    
     protected $casts = [
         'data'           => 'array',
         'direct_message' => 'boolean',
@@ -378,11 +379,31 @@ class Conversation extends BaseModel
             $paginator = $paginator->where('c.client_id', (int) $options['filters']['client_id']);
         }
 
-        return $paginator
+        $total = $paginator->distinct('c.id')->toBase()->getCountForPagination();
+
+        $paginator = $paginator
             ->orderBy('c.updated_at', 'DESC')
             ->orderBy('c.id', 'DESC')
-            ->distinct('c.id')
-            ->paginate($options['perPage'], [$this->tablePrefix.'participation.*', 'c.*'], $options['pageName'], $options['page']);
+            ->distinct('c.updated_at', 'c.id');
+
+        $perPage = $options['perPage'];
+        $pageName = $options['pageName'];
+        $page = $options['page'];
+
+        $results = $paginator
+            ->forPage($page, $perPage)
+            ->get([$this->tablePrefix.'participation.*', 'c.*']);
+
+        return new LengthAwarePaginator(
+            $results,
+            $total,
+            $perPage,
+            $page,
+            [
+                'path' => LengthAwarePaginator::resolveCurrentPath(),
+                'pageName' => $pageName,
+            ]
+        );
     }
 
     public function unDeletedCount()
